@@ -1,0 +1,82 @@
+// Constant for the target button text to click
+const CLICK_TEXT = "Register Now";
+
+// Timer variables for managing click and work cycles
+let clickTimer = null;
+let cycleTimer = null;
+
+// Flag to prevent duplicate execution of the clicking process
+let isClicking = false;
+
+/**
+ * Generates a random integer between min and max (inclusive)
+ * @param {number} min - Minimum time value
+ * @param {number} max - Maximum time value
+ * @returns {number} Random time in milliseconds
+ */
+function randomTime(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Finds and clicks the button with exact text matching CLICK_TEXT
+ */
+function clickTargetBtn() {
+  // Get all button elements on the page
+  const btns = document.querySelectorAll("button");
+  let target = null;
+
+  // Loop through buttons to find the target one
+  for (let b of btns) {
+    if (b.innerText.trim() === CLICK_TEXT) {
+      target = b;
+      break;
+    }
+  }
+
+  // Simulate a click if the target button exists
+  if (target) target.click();
+}
+
+/**
+ * Starts the auto-clicking process with work/rest cycles
+ */
+function startWork() {
+  // Prevent starting multiple instances at the same time
+  if (isClicking) return;
+  isClicking = true;
+
+  // Set random click interval (1800ms - 2200ms) for human-like behavior
+  const clickGap = randomTime(1800, 2200);
+  clickTimer = setInterval(clickTargetBtn, clickGap);
+
+  // Work session duration: 15 minutes
+  const workTime = 15 * 60 * 1000;
+  cycleTimer = setTimeout(() => {
+    // Stop working and start rest period
+    stopWork();
+    // Random rest time between 5 and 10 minutes
+    const restTime = randomTime(5 * 60 * 1000, 10 * 60 * 1000);
+    // Restart work cycle after rest
+    setTimeout(startWork, restTime);
+  }, workTime);
+}
+
+/**
+ * Stops all timers and resets the clicking state
+ */
+function stopWork() {
+  clearInterval(clickTimer);
+  clearTimeout(cycleTimer);
+  isClicking = false;
+}
+
+/**
+ * Public function to fully stop the entire script
+ */
+function stopScript() {
+  stopWork();
+}
+
+// Start the automation script immediately
+startWork();
